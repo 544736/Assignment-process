@@ -1,0 +1,117 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+#define MAX_STAGE 8
+
+// Global training results: 'N' = Not attempted, 'P' = Passed, 'F' = Failed
+char training_results[MAX_STAGE] = {'N','N','N','N','N','N','N','N'};
+
+// Menu titles (1D arrays only)
+const char *main_menu[] = {
+    "I. Audition Management",
+    "II. Training",
+    "III. Debut"
+};
+
+const char *training_menu[] = {
+    "1. Physical Strength & Knowledge",
+    "2. Self-Management & Teamwork",
+    "3. Language & Pronunciation",
+    "4. Vocal",
+    "5. Dance",
+    "6. Visual & Image",
+    "7. Acting & Stage Performance",
+    "8. Fan Communication"
+};
+
+void display_main_menu() {
+    printf("\n=== Magrathea Main Menu ===\n");
+    for (int i = 0; i < 3; i++) {
+        printf("%s\n", main_menu[i]);
+    }
+    printf("Select a menu (1-3), or Q to quit: ");
+}
+
+void display_training_menu() {
+    printf("\n--- Training Menu ---\n");
+    for (int i = 0; i < MAX_STAGE; i++) {
+        printf("%s [%c]\n", training_menu[i], training_results[i]);
+    }
+    printf("Select training stage (1-8), or Q to return: ");
+}
+
+void handle_training(int stage) {
+    if (training_results[stage] != 'N') {
+        printf("Stage already completed.\n");
+        return;
+    }
+
+    // Check sequential rule for stage 1 & 2
+    if ((stage == 1 && training_results[0] != 'P') || (stage >= 2 && stage <= 7 && (training_results[0] != 'P' || training_results[1] != 'P'))) {
+        printf("You must complete Stage 1 and 2 in order before accessing other stages.\n");
+        return;
+    }
+
+    char choice;
+    printf("Would you like to enter the evaluation result? (Y/N): ");
+    scanf(" %c", &choice);
+    getchar();
+
+    if (choice == 'Y') {
+        char result;
+        printf("Did you complete the training and pass the certification? (P/F): ");
+        scanf(" %c", &result);
+        getchar();
+
+        if (result == 'P' || result == 'F') {
+            training_results[stage] = result;
+            printf("Stage %d marked as '%c'.\n", stage + 1, result);
+        } else {
+            printf("Invalid result input.\n");
+        }
+    }
+}
+
+void training_menu_loop() {
+    char input[10];
+    while (1) {
+        display_training_menu();
+        fgets(input, sizeof(input), stdin);
+        if (input[0] == 'Q' || input[0] == 'q' || input[0] == '0' || input[0] == '\n') break;
+
+        int stage = atoi(input);
+        if (stage >= 1 && stage <= MAX_STAGE) {
+            handle_training(stage - 1);
+        } else {
+            printf("Invalid selection.\n");
+        }
+    }
+}
+
+int main() {
+    char input[10];
+    while (1) {
+        display_main_menu();
+        fgets(input, sizeof(input), stdin);
+        if (input[0] == 'Q' || input[0] == 'q' || input[0] == '0' || input[0] == '\n') break;
+
+        int menu = atoi(input);
+        switch(menu) {
+            case 1:
+                printf("[Audition Management Selected]\n");
+                break;
+            case 2:
+                training_menu_loop();
+                break;
+            case 3:
+                printf("[Debut Selected]\n");
+                break;
+            default:
+                printf("Invalid selection.\n");
+                break;
+        }
+    }
+    printf("Program terminated.\n");
+    return 0;
+}
