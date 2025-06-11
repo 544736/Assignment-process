@@ -1,0 +1,73 @@
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <time.h>
+
+#define MAX_TRAINEES 8
+#define MAX_MENTORS 8
+#define MAX_NAME_LEN 20
+
+typedef struct {
+    int id;
+    char name[MAX_NAME_LEN];
+    int menteeIndex; // index of the assigned trainee
+} Mentor;
+
+char trainees[MAX_TRAINEES][MAX_NAME_LEN] = {
+    "Sol", "Ara", "Kai", "Luna", "Noa", "Rin", "Yui", "Jin"
+};
+int traineeScores[MAX_TRAINEES];
+Mentor mentorList[MAX_MENTORS];
+
+int parseIntMember(char* nickname) {
+    int sum = 0;
+    for (int i = 0; nickname[i] != '\0'; i++) {
+        sum += (int)nickname[i];
+    }
+    return sum;
+}
+
+int getRandomAbility() {
+    return (rand() % 901) + 100; // random value between 100 and 1000
+}
+
+void initTrainees() {
+    for (int i = 0; i < MAX_TRAINEES; i++) {
+        traineeScores[i] = getRandomAbility();
+    }
+}
+
+void inputMentors() {
+    printf("Enter up to %d mentor names:\n", MAX_MENTORS);
+    for (int i = 0; i < MAX_MENTORS; i++) {
+        mentorList[i].id = i + 1;
+        printf("Mentor %d name: ", i + 1);
+        scanf("%s", mentorList[i].name);
+        mentorList[i].menteeIndex = -1;
+    }
+}
+
+void matchMentoring() {
+    for (int i = 0; i < MAX_TRAINEES; i++) {
+        int sum = parseIntMember(trainees[i]);
+        int mentorIndex = sum % MAX_MENTORS;
+
+        // BONUS: Ensure each mentor has only one mentee
+        while (mentorList[mentorIndex].menteeIndex != -1) {
+            mentorIndex = (mentorIndex + 1) % MAX_MENTORS;
+        }
+
+        mentorList[mentorIndex].menteeIndex = i;
+    }
+}
+
+void printMentoring() {
+    printf("\n--- Mentor-Trainee Matches ---\n");
+    for (int i = 0; i < MAX_MENTORS; i++) {
+        if (mentorList[i].menteeIndex != -1) {
+            int tIdx = mentorList[i].menteeIndex;
+            printf("Trainee %d (%s) -> Mentor ID %d (%s)\n", 
+                   tIdx, trainees[tIdx], mentorList[i].id, mentorList[i].name);
+        }
+    }
+}
